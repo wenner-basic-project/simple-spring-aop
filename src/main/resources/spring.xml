@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 定义被代理者-->
+    <bean id="benzCar" class="com.wenner.it.spring.aop.service.impl.Benz"/>
+    <bean id="bmwCar" class="com.wenner.it.spring.aop.service.impl.BmwImpl"/>
+
+    <!-- 定义通知内容，也就是切入点前后需要做的事前-->
+    <bean id="carEnhancer" class="com.wenner.it.spring.aop.advice.CarEnhancer"/>
+
+    <!-- 定义切入点位置, 这里定义到了brandDisplay方法上 -->
+    <bean id="carPoint" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+        <property name="pattern" value=".*brandDisplay"></property>
+    </bean>
+
+    <!-- 定义通知器，使切入点与通知关联 -->
+    <bean id="carPointAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="pointcut" ref="carPoint"></property>
+        <property name="advice" ref="carEnhancer"></property>
+    </bean>
+
+    <!-- 设置代理 -->
+    <bean id="proxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <!-- 代理对象 -->
+        <property name="target"  ref="benzCar"></property>
+        <!-- 使用切面 -->
+        <property name="interceptorNames" value="carPointAdvisor"></property>
+        <!-- 代理接口 -->
+        <property name="proxyInterfaces" value="com.wenner.it.spring.aop.service.Car"></property>
+    </bean>
+
+    <!-- 设置代理 -->
+    <bean id="proxy2" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <!-- 代理对象 -->
+        <property name="target" ref="bmwCar"></property>
+        <!-- 使用切面 -->
+        <property name="interceptorNames" value="carPointAdvisor"></property>
+        <!-- 代理接口 -->
+        <property name="proxyInterfaces" value="com.wenner.it.spring.aop.service.Car"></property>
+    </bean>
+</beans>
